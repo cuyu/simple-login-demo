@@ -12,11 +12,12 @@ const addNews = {
     link: { type: new NonNull(StringType) },
     author: { type: StringType },
     pubDate: { type: new NonNull(StringType) },
-    content: { type: StringType },
+    description: { type: StringType },
   },
   resolve(args, context, info) {
     console.log('~~~~~~~~~~~~~~~~~~')
-    console.log(items)
+    console.log(context)
+    items.push(context);
   },
 };
 
