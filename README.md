@@ -7,3 +7,22 @@
   - [express]() - Http server framework
   - [graphql]() - API layer for the http server
   - [React]() - Front-end view layer
+
+
+
+### API
+
+Add a user:
+
+```
+mutation AddUser($name: String!, $password: String!) {
+  addUser(name: $name, password: $password) {
+    name
+  }
+}
+```
+
+`name` and `password` are variables.
+
+
+

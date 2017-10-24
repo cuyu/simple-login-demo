@@ -15,6 +15,7 @@ import {
 import me from './queries/me';
 import news from './queries/news';
 import addNews from './mutations/addNews';
+import addUser from './mutations/addUser';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -28,6 +29,7 @@ const schema = new Schema({
     name: 'Mutation',
     fields: {
       addNews,
+      addUser,
     },
   }),
 });

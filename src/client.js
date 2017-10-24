@@ -12,11 +12,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import deepForceUpdate from 'react-deep-force-update';
 import queryString from 'query-string';
-import { createPath } from 'history/PathUtils';
+import {createPath} from 'history/PathUtils';
+import {ApolloProvider, ApolloClient} from 'react-apollo';
 import App from './components/App';
 import createFetch from './createFetch';
 import history from './history';
-import { updateMeta } from './DOMUtils';
+import {updateMeta} from './DOMUtils';
 import router from './router';
 
 // Global (context) variables that can be easily accessed from any React component
@@ -47,6 +48,8 @@ const scrollPositionsHistory = {};
 if (window.history && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
 }
+
+const apolloClient = new ApolloClient();
 
 // Re-render the app when window.location changes
 async function onLocationChange(location, action) {
@@ -84,7 +87,9 @@ async function onLocationChange(location, action) {
 
     const renderReactApp = isInitialRender ? ReactDOM.hydrate : ReactDOM.render;
     appInstance = renderReactApp(
-      <App context={context}>{route.component}</App>,
+      <ApolloProvider client={apolloClient}>
+        <App context={context}>{route.component}</App>
+      </ApolloProvider>,
       container,
       () => {
         if (isInitialRender) {
