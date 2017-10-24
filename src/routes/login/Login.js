@@ -25,7 +25,7 @@ class Login extends React.Component {
           <p className={s.lead}>
             Log in with your username or company email address.
           </p>
-          <form method="post">
+          <form action="/graphql" method="post">
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="usernameOrEmail">
                 Username or email address:
