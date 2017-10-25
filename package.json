@@ -14,7 +14,6 @@
   ],
   "dependencies": {
     "apollo-client": "^1.9.3",
-    "babel-polyfill": "^7.0.0-beta.2",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "classnames": "^2.2.5",
@@ -58,6 +57,7 @@
     "babel-plugin-transform-react-constant-elements": "^7.0.0-beta.2",
     "babel-plugin-transform-react-inline-elements": "^7.0.0-beta.2",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.9",
+    "babel-polyfill": "^7.0.0-beta.3",
     "babel-preset-env": "^2.0.0-beta.2",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^7.0.0-beta.2",
@@ -156,9 +156,9 @@
     "bundle": "babel-node tools/run bundle",
     "build": "babel-node tools/run build",
     "build-stats": "yarn run build --release --analyse",
-    "deploy": "babel-node tools/run deploy",
-    "render": "babel-node tools/run render",
-    "serve": "babel-node tools/run runServer",
-    "start": "babel-node tools/run start"
+    "deploy": "node -r babel-register tools/run deploy",
+    "render": "node -r babel-register tools/run render",
+    "serve": "node -r babel-register tools/run runServer",
+    "start": "node -r babel-register tools/run start"
   }
 }

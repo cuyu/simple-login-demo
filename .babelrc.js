@@ -24,4 +24,5 @@ module.exports = {
     'react',
   ],
   ignore: ['node_modules', 'build'],
+  plugins: ["module:babel-polyfill"],
 };
