@@ -15,21 +15,36 @@
 
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
-import {User, UserLogin} from './data/models';
+import {User} from './data/models';
+
+passport.serializeUser(function (user, done) {
+  console.log('aaaaaa:', user.name)
+  done(null, user.name);
+});
+
+passport.deserializeUser(function (name, done) {
+  User.findOne({where: {name: name}}).then((user) => {
+    done(null, user);
+  });
+});
 
 passport.use(new LocalStrategy(
   (username, password, done) => {
-    User.findOne({username: username}, function (err, user) {
-      if (err) {
-        return done(err);
-      }
+    User.findOne({where: {name: username}}).then((user) => {
+      console.log('~~~~~~~~~~~~')
+      console.log(user)
+      console.log('~~~~~~~~~~~~')
       if (!user) {
         return done(null, false, {message: 'Incorrect username.'});
       }
-      if (!user.validPassword(password)) {
-        return done(null, false, {message: 'Incorrect password.'});
-      }
       return done(null, user);
+    }, (err) => {
+      if (err) {
+        console.log('===========')
+        console.log(err)
+        console.log('===========')
+        return done(err);
+      }
     });
   })
 );

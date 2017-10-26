@@ -25,16 +25,16 @@ class Login extends React.Component {
           <p className={s.lead}>
             Log in with your username or company email address.
           </p>
-          <form action="/graphql" method="post">
+          <form method="post">
             <div className={s.formGroup}>
-              <label className={s.label} htmlFor="usernameOrEmail">
+              <label className={s.label} htmlFor="username">
                 Username or email address:
               </label>
               <input
                 className={s.input}
-                id="usernameOrEmail"
+                id="username"
                 type="text"
-                name="usernameOrEmail"
+                name="username"
                 autoFocus // eslint-disable-line jsx-a11y/no-autofocus
               />
             </div>

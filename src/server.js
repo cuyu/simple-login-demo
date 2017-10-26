@@ -11,16 +11,17 @@ import path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import expressJwt, { UnauthorizedError as Jwt401Error } from 'express-jwt';
+import expressJwt, {UnauthorizedError as Jwt401Error} from 'express-jwt';
 import expressGraphQL from 'express-graphql';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
+import expressSession from 'express-session';
 import App from './components/App';
 import Html from './components/Html';
-import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
+import {ErrorPageWithoutStyle} from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import createFetch from './createFetch';
 import passport from './passport';
@@ -44,8 +45,9 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // -----------------------------------------------------------------------------
 app.use(express.static(path.resolve(__dirname, 'public')));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(expressSession({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 
 //
 // Authentication
@@ -69,27 +71,15 @@ app.use((err, req, res, next) => {
 });
 
 app.use(passport.initialize());
+app.use(passport.session());
 
 if (__DEV__) {
   app.enable('trust proxy');
 }
-app.get(
-  '/login/facebook',
-  passport.authenticate('facebook', {
-    scope: ['email', 'user_location'],
-    session: false,
-  }),
-);
-app.get(
-  '/login/facebook/return',
-  passport.authenticate('facebook', {
-    failureRedirect: '/login',
-    session: false,
-  }),
-  (req, res) => {
-    const expiresIn = 60 * 60 * 24 * 180; // 180 days
-    const token = jwt.sign(req.user, config.auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
+app.post(
+  '/login',
+  passport.authenticate('local', {failureRedirect: '/login', failureFlash: 'Invalid username or password.'}),
+  function (req, res) {
     res.redirect('/');
   },
 );
@@ -102,7 +92,7 @@ app.use(
   expressGraphQL(req => ({
     schema,
     graphiql: __DEV__,
-    rootValue: { request: req },
+    rootValue: {request: req},
     pretty: __DEV__,
   })),
 );
@@ -110,7 +100,24 @@ app.use(
 //
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------
-app.get('*', async (req, res, next) => {
+app.get(
+  '/login',
+  renderClient,
+);
+
+app.get(
+  '*',
+  (req, res, next) => {
+    console.log(req.user)
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      return res.redirect('/login');
+    }
+    next();
+  },
+  renderClient,
+);
+
+async function renderClient(req, res, next) {
   try {
     const css = new Set();
 
@@ -141,11 +148,11 @@ app.get('*', async (req, res, next) => {
       return;
     }
 
-    const data = { ...route };
+    const data = {...route};
     data.children = ReactDOM.renderToString(
       <App context={context}>{route.component}</App>,
     );
-    data.styles = [{ id: 'css', cssText: [...css].join('') }];
+    data.styles = [{id: 'css', cssText: [...css].join('')}];
     data.scripts = [assets.vendor.js];
     if (route.chunks) {
       data.scripts.push(...route.chunks.map(chunk => assets[chunk].js));
@@ -161,7 +168,7 @@ app.get('*', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+}
 
 //
 // Error handling
@@ -177,9 +184,9 @@ app.use((err, req, res, next) => {
     <Html
       title="Internal Server Error"
       description={err.message}
-      styles={[{ id: 'css', cssText: errorPageStyle._getCss() }]} // eslint-disable-line no-underscore-dangle
+      styles={[{id: 'css', cssText: errorPageStyle._getCss()}]} // eslint-disable-line no-underscore-dangle
     >
-      {ReactDOM.renderToString(<ErrorPageWithoutStyle error={err} />)}
+    {ReactDOM.renderToString(<ErrorPageWithoutStyle error={err}/>)}
     </Html>,
   );
   res.status(err.status || 500);

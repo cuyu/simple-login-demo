@@ -19,8 +19,6 @@ const addUser = {
     password: {type: StringType},
   },
   resolve(args, context, info) {
-    console.log('~~~~~~~~~~~~~~~~~~')
-    console.log(context)
     insertUser(context).catch(err => console.log(err));
   },
 };
