@@ -44,6 +44,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
 app.use(express.static(path.resolve(__dirname, 'public')));
+app.use(require('morgan')('combined'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -52,23 +53,23 @@ app.use(expressSession({ secret: 'keyboard cat', resave: false, saveUninitialize
 //
 // Authentication
 // -----------------------------------------------------------------------------
-app.use(
-  expressJwt({
-    secret: config.auth.jwt.secret,
-    credentialsRequired: false,
-    getToken: req => req.cookies.id_token,
-  }),
-);
-// Error handler for express-jwt
-app.use((err, req, res, next) => {
-  // eslint-disable-line no-unused-vars
-  if (err instanceof Jwt401Error) {
-    console.error('[express-jwt-error]', req.cookies.id_token);
-    // `clearCookie`, otherwise user can't use web-app until cookie expires
-    res.clearCookie('id_token');
-  }
-  next(err);
-});
+// app.use(
+//   expressJwt({
+//     secret: config.auth.jwt.secret,
+//     credentialsRequired: false,
+//     getToken: req => req.cookies.id_token,
+//   }),
+// );
+// // Error handler for express-jwt
+// app.use((err, req, res, next) => {
+//   // eslint-disable-line no-unused-vars
+//   if (err instanceof Jwt401Error) {
+//     console.error('[express-jwt-error]', req.cookies.id_token);
+//     // `clearCookie`, otherwise user can't use web-app until cookie expires
+//     res.clearCookie('id_token');
+//   }
+//   next(err);
+// });
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -78,7 +79,7 @@ if (__DEV__) {
 }
 app.post(
   '/login',
-  passport.authenticate('local', {failureRedirect: '/login', failureFlash: 'Invalid username or password.'}),
+  passport.authenticate('local', {failureRedirect: '/login', failureFlash: true}),
   function (req, res) {
     res.redirect('/');
   },
@@ -108,7 +109,6 @@ app.get(
 app.get(
   '*',
   (req, res, next) => {
-    console.log(req.user)
     if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.redirect('/login');
     }
