@@ -18,12 +18,10 @@ import LocalStrategy from 'passport-local';
 import {User} from './data/models';
 
 passport.serializeUser(function (user, done) {
-  console.log('aaaaaa:', user.name)
   done(null, user.name);
 });
 
 passport.deserializeUser(function (name, done) {
-  console.log('deserializeUser``````')
   User.findOne({where: {name: name}}).then((user) => {
     done(null, user);
   });
@@ -33,7 +31,10 @@ passport.use(new LocalStrategy(
   (username, password, done) => {
     User.findOne({where: {name: username}}).then((user) => {
       if (!user) {
-        return done(null, false, {message: 'Incorrect username.'});
+        return done(null, false);
+      }
+      if (user.password !== password) {
+        return done(null, false);
       }
       return done(null, user);
     }, (err) => {

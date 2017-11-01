@@ -82,3 +82,11 @@
   border-color: #0074c2;
   box-shadow: 0 0 8px rgba(0, 116, 194, 0.6);
 }
+
+.warning {
+  padding-bottom: 20px;
+}
+
+.warning > span {
+  color: red;
+}

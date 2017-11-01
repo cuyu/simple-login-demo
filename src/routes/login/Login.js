@@ -10,12 +10,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import axios from 'axios';
 import s from './Login.css';
 
 class Login extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
   };
+
+  constructor() {
+    super();
+    this.state = {
+      message: '',
+    };
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    axios.post('http://localhost:3000/login', {
+      username: this.inputUsername.value,
+      password: this.inputPassword.value,
+    }).then((response) => {
+      this.setState({message: ''});
+      console.log(response)
+      // redirect to root path if login success
+      window.location = '/';
+    }).catch((error) => {
+      console.log(error)
+      this.setState({message: 'Username or password is not correct!'});
+    });
+  }
 
   render() {
     return (
@@ -25,7 +49,7 @@ class Login extends React.Component {
           <p className={s.lead}>
             Log in with your username or company email address.
           </p>
-          <form method="post">
+          <form method="post" onSubmit={this.handleSubmit.bind(this)}>
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="username">
                 Username or email address:
@@ -36,6 +60,7 @@ class Login extends React.Component {
                 type="text"
                 name="username"
                 autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+                ref={(input) => this.inputUsername = input}
               />
             </div>
             <div className={s.formGroup}>
@@ -47,7 +72,13 @@ class Login extends React.Component {
                 id="password"
                 type="password"
                 name="password"
+                ref={(input) => this.inputPassword = input}
               />
+            </div>
+            <div className={s.warning}>
+              <span>
+                {this.state.message}
+              </span>
             </div>
             <div className={s.formGroup}>
               <button className={s.button} type="submit">

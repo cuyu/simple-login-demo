@@ -53,24 +53,6 @@ app.use(expressSession({ secret: 'keyboard cat', resave: false, saveUninitialize
 //
 // Authentication
 // -----------------------------------------------------------------------------
-// app.use(
-//   expressJwt({
-//     secret: config.auth.jwt.secret,
-//     credentialsRequired: false,
-//     getToken: req => req.cookies.id_token,
-//   }),
-// );
-// // Error handler for express-jwt
-// app.use((err, req, res, next) => {
-//   // eslint-disable-line no-unused-vars
-//   if (err instanceof Jwt401Error) {
-//     console.error('[express-jwt-error]', req.cookies.id_token);
-//     // `clearCookie`, otherwise user can't use web-app until cookie expires
-//     res.clearCookie('id_token');
-//   }
-//   next(err);
-// });
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -79,9 +61,9 @@ if (__DEV__) {
 }
 app.post(
   '/login',
-  passport.authenticate('local', {failureRedirect: '/login', failureFlash: true}),
-  function (req, res) {
-    res.redirect('/');
+  passport.authenticate('local', {}),
+  function(req, res) {
+    res.send('login successfully');
   },
 );
 
