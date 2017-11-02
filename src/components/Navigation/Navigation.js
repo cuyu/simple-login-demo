@@ -30,6 +30,16 @@ class Navigation extends React.Component {
     });
   }
 
+  handleLogout() {
+    axios.get('/logout').then(
+      (response) => {
+        window.location = '/login';
+      },
+    ).catch(
+      (err) => console.warn(err)
+    );
+  }
+
   render() {
     if (this.state.mouseOn) {
       return (
@@ -41,12 +51,12 @@ class Navigation extends React.Component {
             Contact
           </Link>
           <span className={s.spacer}> | </span>
-          <Link className={s.link} to="/logout" onMouseLeave={() => this.setState({
+          <span className={s.link} onClick={this.handleLogout} onMouseLeave={() => this.setState({
             ...this.state,
             mouseOn: false,
           })}>
             Log out
-          </Link>
+          </span>
         </div>
       );
     }

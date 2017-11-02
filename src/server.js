@@ -94,9 +94,18 @@ app.get(
       res.send(req.session.passport.user);
     }
     else {
-      res.redirect('/login');
+      res.status(500);
+      res.send('Unauthorized');
     }
   }
+);
+
+app.get(
+  '/logout',
+  (req, res) => {
+    req.logout();
+    res.send('login successfully');
+  },
 );
 
 app.get(
