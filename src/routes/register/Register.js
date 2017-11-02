@@ -29,9 +29,9 @@ class Register extends React.Component {
               </label>
               <input
                 className={s.input}
-                id="usernameOrEmail"
+                id="username"
                 type="text"
-                name="usernameOrEmail"
+                name="username"
                 autoFocus // eslint-disable-line jsx-a11y/no-autofocus
               />
             </div>

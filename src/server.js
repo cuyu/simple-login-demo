@@ -11,9 +11,7 @@ import path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import expressJwt, {UnauthorizedError as Jwt401Error} from 'express-jwt';
 import expressGraphQL from 'express-graphql';
-import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
@@ -48,7 +46,7 @@ app.use(require('morgan')('combined'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(expressSession({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(expressSession({secret: 'keyboard cat', resave: false, saveUninitialized: false}));
 
 //
 // Authentication
@@ -62,7 +60,7 @@ if (__DEV__) {
 app.post(
   '/login',
   passport.authenticate('local', {}),
-  function(req, res) {
+  function (req, res) {
     res.send('login successfully');
   },
 );
@@ -86,6 +84,19 @@ app.use(
 app.get(
   '/login',
   renderClient,
+);
+
+app.get(
+  '/user',
+  (req, res) => {
+    if (req.session.passport) {
+      res.status(200);
+      res.send(req.session.passport.user);
+    }
+    else {
+      res.redirect('/login');
+    }
+  }
 );
 
 app.get(

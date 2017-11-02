@@ -37,3 +37,10 @@ mutation AddUser($name: String!, $password: String!) {
 Add a todo:
 
 Mark a todo as done:
+
+
+### Some thinkings
+
+1. Why not put `/login` and `/register` endpoints into `/graphql`?
+
+Because `/graphql` needs authenticated session while `/login` and `/register` are used with no authentication yet.
